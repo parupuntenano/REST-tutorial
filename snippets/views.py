@@ -56,7 +56,7 @@ def snippet_list(request, format=None):
 
 # GET・PUT・DELETEを受け付けるAPI
 @api_view(["GET", "PUT", "DELETE"])
-def snippet_detail(request, pk):
+def snippet_detail(request, pk, format=None):
 
     # 指定されたpkのSnippetを1件取得
     try:
