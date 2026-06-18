@@ -1,6 +1,7 @@
 from django.db import models
 from pygments.lexers import get_all_lexers
 from pygments.styles import get_all_styles
+from django.contrib.auth.models import User
 
 LEXERS = [
     item for item in get_all_lexers()
@@ -31,6 +32,8 @@ class Snippet(models.Model):
         default="friendly",
         max_length=100,
     )
+    owner = models.ForeignKey(User, related_name="snippets", on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         ordering = ["created"]
