@@ -1,7 +1,9 @@
 from django.db import models
-from pygments.lexers import get_all_lexers
+from pygments.lexers import get_all_lexers,get_lexer_by_name
 from pygments.styles import get_all_styles
 from django.contrib.auth.models import User
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
 
 LEXERS = [
     item for item in get_all_lexers()
@@ -32,8 +34,29 @@ class Snippet(models.Model):
         default="friendly",
         max_length=100,
     )
+    highlighted = models.TextField()
     owner = models.ForeignKey(User, related_name="snippets", on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         ordering = ["created"]
+
+    def save(self, *args, **kwargs):
+        lexer = get_lexer_by_name(self.language)
+        linenos = "table" if self.linenos else False
+
+        options = {
+            "title": self.title
+        }
+        formatter = HtmlFormatter(
+        style=self.style,
+        linenos=linenos,
+        full=True,
+        **options
+        )
+        self.highlighted = highlight(
+        self.code,
+        lexer,
+        formatter
+        )
+        super().save(*args, **kwargs)
